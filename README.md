@@ -347,6 +347,24 @@ Step 3：到 GitHub 網頁發 Pull Request
 └── ...
 ```
 
+## 課程軟體下載
+
+本課程所需軟體已整理於 Dropbox 共用資料夾，請自行下載安裝：
+
+下載連結：[課程軟體 Dropbox](https://www.dropbox.com/scl/fo/u4y9l6q0hyb3pnnd2hykm/AOtzjdBUuiPzwx9q_5ur-i0?rlkey=i7y0hmz2dch4zdf4qoexzgyj4&dl=0)
+
+主要軟體清單：
+
+| 軟體 | 用途 |
+|------|------|
+| Git | 版本控制 |
+| VS Code | 程式開發 IDE |
+| MobaXterm | SSH 連線工具（Windows） |
+| Python / Miniconda | Python 開發環境 |
+| Docker Desktop | 容器化技術 |
+
+---
+
 ## Linux 練習環境連線資訊
 
 | 項目 | 主機 1 | 主機 2 |
