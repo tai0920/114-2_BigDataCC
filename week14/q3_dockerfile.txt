@@ -1,0 +1,56 @@
+﻿姓名：姚台安
+學號：C112181146
+
+=== 我撰寫的 Dockerfile 內容 ===
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+
+=== docker build 輸出 ===
+#9 [5/5] COPY . .
+#9 DONE 0.1s
+#10 exporting to image
+#10 exporting layers 0.4s done
+#10 exporting manifest sha256:9860f79135c84ce3900ed8320307fdfde6ac1624ade0b78ec2cddf47383e6db4 done
+#10 naming to docker.io/library/ship-api:v1 done
+#10 DONE 0.7s
+
+=== docker images 確認 ===
+ship-api:v1        06d0cd63a684        210MB         51.2MB
+
+=== API 測試結果 ===
+
+curl http://localhost:8080/ 輸出：
+{"message":"高雄港船舶資料 API","total_ships":3,"version":"1.0"}
+
+curl http://localhost:8080/ships 輸出：
+[{"id":1,"name":"Ever Given","port":"Kaohsiung","tonnage":220940,"type":"Container"},{"id":2,"name":"Formosa 1","port":"Kaohsiung","tonnage":85000,"type":"Bulk"},{"id":3,"name":"Ocean Star","port":"Taichung","tonnage":95000,"type":"Tanker"}]
+
+curl http://localhost:8080/ships/2 輸出：
+{"id":2,"name":"Formosa 1","port":"Kaohsiung","tonnage":85000,"type":"Bulk"}
+
+=== 清理 ===
+docker stop ship-api
+docker rm ship-api
+
+（執行完成後貼上 docker ps -a | grep ship-api 的結果，確認已清除）
+（無輸出，代表 ship-api 容器已完全移除）
+
+=== 觀念題 ===
+Q1：Dockerfile 中 RUN 和 CMD 有什麼不同？分別在什麼時候執行？
+A1：RUN 是在建立映像檔時執行的指令，通常用來安裝套件、建立資料夾或設定環境。例如 RUN pip install -r requirements.txt 會在 docker build 時執行，並把結果存進映像檔。CMD 是在容器啟動時執行的預設指令，例如 CMD ["python", "app.py"] 會在 docker run 時執行，用來啟動應用程式。簡單來說，RUN 是 build 階段執行，CMD 是 container run 階段執行。
+
+Q2：為什麼要先 COPY requirements.txt 安裝套件，再 COPY . . 複製程式碼？
+   如果反過來，每次改 app.py 時會多做什麼事？
+A2：先 COPY requirements.txt 再安裝套件，是為了善用 Docker 的 build cache。因為套件清單通常不會頻繁修改，所以 Docker 可以重複使用已經安裝好套件的快取層，讓之後 build 更快。
+如果先 COPY . . 再安裝套件，當 app.py 只要有任何修改，Docker 就會判定前面的檔案層改變，導致 pip install 重新執行。這樣每次只是改程式碼，也會重新安裝 Flask 等套件，浪費時間並降低建置效率。
